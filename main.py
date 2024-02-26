@@ -5,13 +5,17 @@ from aiogram.filters import Command
 from smsactivate.api import SMSActivateAPI
 
 from sms_activate import get_phone_number, get_status, set_status
+from dotenv import load_dotenv
+import os
 
-API_TOKEN = 'TELEGRAM_TOKEN'
-SMS_API_KEY = 'SMS_ACTIVATE_API_KEY'
+load_dotenv()
+API_TOKEN = os.getenv('API_TOKEN')
+SMS_API_KEY = os.getenv('SMS_API_KEY')
+
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-sa = SMSActivateAPI('e3cb751b037fc36c4fb0Ab999ccf85cA')
+sa = SMSActivateAPI(SMS_API_KEY)
 sa.debug_mode = True
 
 
@@ -25,7 +29,7 @@ async def rent_number(message: types.Message):
     phone_number, activation_id = get_phone_number(SMS_API_KEY)
     if activation_id:
         await message.reply(f"Ваш номер: {phone_number}. Ожидаем код...")
-        await asyncio.sleep(150)  # Ожидание 10 минут
+        await asyncio.sleep(150)  # Ожидание 2 минут
         status = get_status(SMS_API_KEY, activation_id)
         if "STATUS_OK" in status:
             code = status.split(":")[1].strip()
